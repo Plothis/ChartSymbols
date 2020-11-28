@@ -1,4 +1,4 @@
-import Treemap from './svg-base/Treemap.svg';
+import { Treemap } from './charts';
 
 const ChartSymbols = {
   Treemap,
