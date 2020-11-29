@@ -1,5 +1,4 @@
 const treemap: string = `
-<?xml version="1.0" encoding="UTF-8"?>
 <svg width="240px" height="200px" viewBox="0 0 240 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <!--Author: Plothis Studio - for Gradict - http://tuzhidian.com-->
   <defs>

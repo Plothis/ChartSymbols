@@ -7,3 +7,5 @@ const ChartSymbols = {
 export default ChartSymbols;
 
 export { Treemap };
+
+export { SymbolImg } from './Symbol';
