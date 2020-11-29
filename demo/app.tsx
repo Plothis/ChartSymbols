@@ -10,7 +10,7 @@ class App extends React.Component<{}> {
   public render() {
     const { svgCode, name } = Treemap;
     return (
-      <div>
+      <div className="symbol-img-container">
         <SymbolImg alt={name} svg={svgCode} />
       </div>
     );

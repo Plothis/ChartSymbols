@@ -38,7 +38,6 @@
     Treemap
   </title>
   <g id="Treemap" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-    <rect id="bg" class="color-assist-bg" fill-rule="nonzero" x="0" y="0" width="240" height="200"/>
     <g id="graphic" transform="translate(51.000000, 53.000000)" fill-rule="nonzero">
       <rect id="Rectangle-08" class="color-theme-08" x="122" y="65" width="16" height="29"/>
       <rect id="Rectangle-07" class="color-theme-07" x="100" y="65" width="22" height="29"/>

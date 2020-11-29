@@ -35,6 +35,17 @@ const prodConfig = {
         },
       },
       {
+        test: /\.(css|less)$/,
+        use: [
+          { loader: 'style-loader' },
+          { loader: 'css-loader', options: { sourceMap: true } },
+          {
+            loader: 'less-loader',
+            options: { lessOptions: { sourceMap: true, javascriptEnabled: true } },
+          },
+        ],
+      },
+      {
         test: /\.svg$/,
         use: [
           {
@@ -93,7 +104,7 @@ const devConfig = {
           { loader: 'css-loader', options: { sourceMap: true } },
           {
             loader: 'less-loader',
-            options: { sourceMap: true, javascriptEnabled: true },
+            options: { lessOptions: { sourceMap: true, javascriptEnabled: true } },
           },
         ],
       },
