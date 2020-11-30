@@ -111,6 +111,8 @@ const svgo = new SVGO({
 
 const extractSVGs = async () => {
   const SVG_PATH = 'svgs/';
+  const TS_PATH = 'src/charts/';
+
   const files = await fse.readdir(SVG_PATH);
   console.log(files.toString());
 
@@ -123,6 +125,10 @@ const extractSVGs = async () => {
 
   const result = await svgo.optimize(data);
   console.log(result);
+
+  const tsPath = path.join(process.cwd(), TS_PATH, `${path.basename(files[1], path.extname(files[1]))}.ts`);
+
+  await fse.writeFile(tsPath, result.data);
 };
 
 (async () => {
