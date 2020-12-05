@@ -2,133 +2,58 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as SVGO from 'svgo';
 
-const svgo = new SVGO({
-  plugins: [
-    {
-      cleanupAttrs: true,
-    },
-    {
-      removeDoctype: true,
-    },
-    {
-      removeXMLProcInst: true,
-    },
-    {
-      removeComments: true,
-    },
-    {
-      removeMetadata: true,
-    },
-    {
-      removeTitle: true,
-    },
-    {
-      removeDesc: true,
-    },
-    {
-      removeUselessDefs: true,
-    },
-    {
-      removeEditorsNSData: true,
-    },
-    {
-      removeEmptyAttrs: true,
-    },
-    {
-      removeHiddenElems: true,
-    },
-    {
-      removeEmptyText: true,
-    },
-    {
-      removeEmptyContainers: true,
-    },
-    {
-      removeViewBox: false,
-    },
-    {
-      cleanupEnableBackground: true,
-    },
-    {
-      convertStyleToAttrs: true,
-    },
-    {
-      convertColors: true,
-    },
-    {
-      convertPathData: true,
-    },
-    {
-      convertTransform: true,
-    },
-    {
-      removeUnknownsAndDefaults: true,
-    },
-    {
-      removeNonInheritableGroupAttrs: true,
-    },
-    {
-      removeUselessStrokeAndFill: true,
-    },
-    {
-      removeUnusedNS: true,
-    },
-    {
-      cleanupIDs: true,
-    },
-    {
-      cleanupNumericValues: true,
-    },
-    {
-      moveElemsAttrsToGroup: true,
-    },
-    {
-      moveGroupAttrsToElems: true,
-    },
-    {
-      collapseGroups: true,
-    },
-    {
-      removeRasterImages: false,
-    },
-    {
-      mergePaths: true,
-    },
-    {
-      convertShapeToPath: true,
-    },
-    {
-      sortAttrs: true,
-    },
-    {
-      removeDimensions: true,
-    },
-    {
-      removeAttrs: { attrs: '(stroke|fill)' },
-    },
-  ],
-});
+import { SVGO_SETTINGS } from './svgo-settings';
 
+const svgo: SVGO = new SVGO(SVGO_SETTINGS);
+
+/**
+ * Extract svg images from `svgs/`, optimize svg codes
+ * and then generate corresponding ts file in `src/charts/`.
+ */
 const extractSVGs = async () => {
   const SVG_PATH = 'svgs/';
   const TS_PATH = 'src/charts/';
 
+  // optimize current svg images
   const files = await fse.readdir(SVG_PATH);
-  console.log(files.toString());
+  const filePaths = files.map(file => path.join(process.cwd(), SVG_PATH, file));
 
-  const filePath = path.join(process.cwd(), SVG_PATH, files[1]);
+  const svgs: string[] = await Promise.all(
+    filePaths.map(
+      async (filePath): Promise<string> => {
+        return await fse.readFile(filePath, { encoding: 'utf8' });
+      },
+    ),
+  );
 
-  const data = await fse.readFile(filePath, { encoding: 'utf8' });
-  console.log(data);
+  const optSvgs: string[] = await Promise.all(
+    svgs.map(
+      async (svg): Promise<string> => {
+        const { data } = await svgo.optimize(svg);
+        return data;
+      },
+    ),
+  );
 
-  console.log('===========');
+  // generate ts files
 
-  const result = await svgo.optimize(data);
-  console.log(result);
+  await Promise.all(
+    optSvgs.map(async (optSvg, index) => {
+      const file = files[index];
+      const fileName = path.basename(file, path.extname(file));
+      const tsPath = path.join(process.cwd(), TS_PATH, `${fileName}.ts`);
 
-  const tsPath = path.join(process.cwd(), TS_PATH, `${path.basename(files[1], path.extname(files[1]))}.ts`);
+      const fileContent = `
+const ${fileName} = {
+  name: '${fileName}',
+  svgCode: '${optSvg}'
+};
 
-  await fse.writeFile(tsPath, result.data);
+export default ${fileName};
+      `;
+      await fse.writeFile(tsPath, fileContent);
+    }),
+  );
 };
 
 (async () => {
