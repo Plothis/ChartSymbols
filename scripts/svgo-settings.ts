@@ -99,11 +99,5 @@ export const SVGO_SETTINGS = {
     {
       sortAttrs: true,
     },
-    {
-      removeDimensions: true,
-    },
-    {
-      removeAttrs: { attrs: '(stroke|fill)' },
-    },
   ],
 };
