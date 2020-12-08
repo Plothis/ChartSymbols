@@ -59,6 +59,17 @@ const ${chartId} = {
 export default ${chartId};
 `;
 
+const indexTemplate = (chartFiles: string[]) => `// generated file index.ts
+
+${chartFiles.map((file: string) => `import ${file} from './${file}';`).join('\n')}
+
+export const ChartSymbols = {
+  ${chartFiles.map((file: string) => `${file}`).join(', ')}
+};
+
+export { ${chartFiles.map((file: string) => `${file}`).join(', ')} };
+`;
+
 const ckb = CKBJson();
 
 /**
@@ -71,8 +82,6 @@ const extractSVGs = async () => {
   const chartBase: IChartBaseRecord[] = [];
 
   const files = await fse.readdir(SVG_PATH);
-
-  console.log(files);
 
   const questions: inquirer.Question[] = [];
   const notices: string[] = [];
@@ -104,9 +113,6 @@ const extractSVGs = async () => {
   notices.forEach(notice => console.log(notice));
 
   await inquirer.prompt(questions).then(async answers => {
-    console.log('>>>>>> ans');
-    console.log(answers);
-
     await Promise.all(
       Object.keys(answers).map(async fileName => {
         if (answers[fileName]) {
@@ -116,33 +122,30 @@ const extractSVGs = async () => {
     );
   });
 
-  console.log('xxxx');
-
-  console.log(chartBase);
-
-  // clear charts except index
+  // clear charts
 
   const currentTsFileNames = await fse.readdir(TS_PATH);
   const currentTsFilePaths = currentTsFileNames.map(fileName => path.join(process.cwd(), TS_PATH, fileName));
   await Promise.all(
     currentTsFilePaths.map(async tsPath => {
-      if (path.basename(tsPath) !== 'index.ts') {
-        await fse.unlink(tsPath);
-      }
+      await fse.unlink(tsPath);
     }),
   );
 
   // generate ts files
-
-  console.log('yyyyy');
-
-  console.log(chartBase);
 
   await Promise.all(
     chartBase.map(async rec => {
       const { tsFilePath, chartId, chartName, svgCode } = rec;
       await fse.writeFile(tsFilePath, fileTemplate({ chartId, chartName, svgCode }));
     }),
+  );
+
+  // update index.ts
+
+  await fse.writeFile(
+    path.join(process.cwd(), TS_PATH, 'index.ts'),
+    indexTemplate(chartBase.map(rec => rec.tsFileName).sort()),
   );
 };
 

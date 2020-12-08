@@ -1,9 +1,10 @@
+// generated file index.ts
+
+import pie_chart from './pie_chart';
 import treemap from './treemap';
 
-const ChartSymbols = {
-  treemap,
+export const ChartSymbols = {
+  pie_chart, treemap
 };
 
-export default ChartSymbols;
-
-export { treemap };
+export { pie_chart, treemap };
