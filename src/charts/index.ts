@@ -1,9 +1,9 @@
-import Treemap from './treemap';
+import treemap from './treemap';
 
-const Charts = {
-  treemap: Treemap,
+const ChartSymbols = {
+  treemap,
 };
 
-export default Charts;
+export default ChartSymbols;
 
-export { Treemap };
+export { treemap };

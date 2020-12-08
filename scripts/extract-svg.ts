@@ -1,4 +1,4 @@
-import { CHART_ID_OPTIONS, ChartID } from '@antv/knowledge';
+import { CHART_ID_OPTIONS, ChartID, CKBJson } from '@antv/knowledge';
 import * as fse from 'fs-extra';
 import * as inquirer from 'inquirer';
 import * as path from 'path';
@@ -6,40 +6,66 @@ import * as SVGO from 'svgo';
 import { SVGO_SETTINGS } from './svgo-settings';
 
 interface IChartInfo {
-  name: string;
+  chartId: string;
+  chartName: string;
   svgCode: string;
 }
 
 interface IChartBaseRecord {
-  svgFileName?: string;
-  svgFilePath?: string;
-  tsFileName?: string;
-  tsFilePath?: string;
-  chartId?: string;
-  chartName?: string;
-  svgCode?: string;
+  svgFileName: string;
+  svgFilePath: string;
+  tsFileName: string;
+  tsFilePath: string;
+  chartId: string;
+  chartName: string;
+  svgCode: string;
 }
+
+const SVG_PATH = 'svgs/';
+const TS_PATH = 'src/charts/';
+
+const genChartBaseRecord = async (fileName: string): Promise<IChartBaseRecord> => {
+  const chartId = fileName;
+  const chartName = CHART_ID_OPTIONS.includes(fileName as ChartID) ? ckb[fileName].name : fileName;
+
+  const tsFileName = chartId;
+  const tsFilePath = path.join(process.cwd(), TS_PATH, `${tsFileName}.ts`);
+
+  const svgFilePath = path.join(process.cwd(), SVG_PATH, `${fileName}.svg`);
+
+  const svg = await fse.readFile(svgFilePath as string, { encoding: 'utf8' });
+  const { data: optSvg } = await svgo.optimize(svg);
+
+  return {
+    chartId,
+    chartName,
+    svgCode: optSvg,
+    svgFileName: fileName,
+    svgFilePath,
+    tsFileName,
+    tsFilePath,
+  };
+};
 
 const svgo: SVGO = new SVGO(SVGO_SETTINGS);
 
-const fileTemplate = ({ name, svgCode }: IChartInfo) => `// ${name}
+const fileTemplate = ({ chartId, chartName, svgCode }: IChartInfo) => `// ${chartId}
 
-const ${name} = {
-  name: '${name}',
+const ${chartId} = {
+  name: '${chartName}',
   svgCode: '${svgCode}'
 };
 
-export default ${name};
+export default ${chartId};
 `;
+
+const ckb = CKBJson();
 
 /**
  * Extract svg images from `svgs/`, optimize svg codes
  * and then generate corresponding ts file in `src/charts/`.
  */
 const extractSVGs = async () => {
-  const SVG_PATH = 'svgs/';
-  const TS_PATH = 'src/charts/';
-
   // get all charts
 
   const chartBase: IChartBaseRecord[] = [];
@@ -51,74 +77,71 @@ const extractSVGs = async () => {
   const questions: inquirer.Question[] = [];
   const notices: string[] = [];
 
-  files.forEach(file => {
-    const fileExtName = path.extname(file);
-    const fileName = path.basename(file, fileExtName);
+  await Promise.all(
+    files.map(async file => {
+      const fileExtName = path.extname(file);
+      const fileName = path.basename(file, fileExtName);
 
-    if (fileExtName !== '.svg') {
-      notices.push(`File ${file} is not with .svg and it has been ignored.`);
-
-      return;
-    }
-
-    // `file` should be a ChartID
-    if (!CHART_ID_OPTIONS.includes(fileName as ChartID)) {
-      questions.push({
-        default: false,
-        message: `The name of file ${fileName} is not a ChartID. Still want to add it?`,
-        name: fileName,
-        type: 'confirm',
-      });
-    }
-  });
+      if (fileExtName !== '.svg') {
+        notices.push(`File ${file} is not with .svg and it has been ignored.`);
+      } else {
+        // `file` should be a ChartID
+        if (CHART_ID_OPTIONS.includes(fileName as ChartID)) {
+          chartBase.push(await genChartBaseRecord(fileName));
+        } else {
+          questions.push({
+            default: false,
+            message: `The name of file ${fileName} is not a ChartID. Still want to add it?`,
+            name: fileName,
+            type: 'confirm',
+          });
+        }
+      }
+    }),
+  );
 
   // tslint:disable-next-line: no-console
   notices.forEach(notice => console.log(notice));
 
-  await inquirer.prompt(questions).then(answers => {
+  await inquirer.prompt(questions).then(async answers => {
     console.log('>>>>>> ans');
     console.log(answers);
 
-    Object.keys(answers).forEach(fileName => {
-      chartBase.push({ svgFileName: fileName, svgFilePath: path.join(process.cwd(), SVG_PATH, `${fileName}.svg`) });
-    });
+    await Promise.all(
+      Object.keys(answers).map(async fileName => {
+        if (answers[fileName]) {
+          chartBase.push(await genChartBaseRecord(fileName));
+        }
+      }),
+    );
   });
 
   console.log('xxxx');
 
   console.log(chartBase);
 
-  const svgs: string[] = await Promise.all(
-    chartBase
-      .filter(rec => rec.svgFilePath)
-      .map(
-        async (rec): Promise<string> => {
-          const { svgFilePath } = rec;
-          return await fse.readFile(svgFilePath as string, { encoding: 'utf8' });
-        },
-      ),
-  );
+  // clear charts except index
 
-  // optimize current svg images
-
-  const optSvgs: string[] = await Promise.all(
-    svgs.map(
-      async (svg): Promise<string> => {
-        const { data } = await svgo.optimize(svg);
-        return data;
-      },
-    ),
+  const currentTsFileNames = await fse.readdir(TS_PATH);
+  const currentTsFilePaths = currentTsFileNames.map(fileName => path.join(process.cwd(), TS_PATH, fileName));
+  await Promise.all(
+    currentTsFilePaths.map(async tsPath => {
+      if (path.basename(tsPath) !== 'index.ts') {
+        await fse.unlink(tsPath);
+      }
+    }),
   );
 
   // generate ts files
 
-  await Promise.all(
-    optSvgs.map(async (optSvg, index) => {
-      const file = files[index];
-      const fileName = path.basename(file, path.extname(file));
-      const tsPath = path.join(process.cwd(), TS_PATH, `${fileName}.ts`);
+  console.log('yyyyy');
 
-      await fse.writeFile(tsPath, fileTemplate({ name: fileName, svgCode: optSvg }));
+  console.log(chartBase);
+
+  await Promise.all(
+    chartBase.map(async rec => {
+      const { tsFilePath, chartId, chartName, svgCode } = rec;
+      await fse.writeFile(tsFilePath, fileTemplate({ chartId, chartName, svgCode }));
     }),
   );
 };

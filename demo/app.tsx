@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { SymbolImg, Treemap } from '../src';
+import { SymbolImg, treemap } from '../src';
 
 class App extends React.Component<{}> {
   constructor(props: {}) {
@@ -8,7 +8,7 @@ class App extends React.Component<{}> {
   }
 
   public render() {
-    const { svgCode, name } = Treemap;
+    const { svgCode, name } = treemap;
     return (
       <div className="symbol-img-container">
         <SymbolImg alt={name} svg={svgCode} />
