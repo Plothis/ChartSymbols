@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { SymbolImg, Treemap } from '../src';
+import { ChartSymbols, SymbolImg } from '../src';
 
 class App extends React.Component<{}> {
   constructor(props: {}) {
@@ -8,10 +8,16 @@ class App extends React.Component<{}> {
   }
 
   public render() {
-    const { svgCode, name } = Treemap;
     return (
-      <div className="symbol-img-container">
-        <SymbolImg alt={name} svg={svgCode} />
+      <div className="symbols">
+        {Object.keys(ChartSymbols).map(chart => {
+          const { svgCode, name } = ChartSymbols[chart];
+          return (
+            <div className="symbol-img-container">
+              <SymbolImg alt={name} svg={svgCode} />
+            </div>
+          );
+        })}
       </div>
     );
   }
