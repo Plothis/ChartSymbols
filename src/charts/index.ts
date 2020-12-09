@@ -1,10 +1,13 @@
 // generated file index.ts
 
-import pie_chart from './pie_chart';
+import donut_chart from './donut_chart';
+import radar_chart from './radar_chart';
+import sankey_diagram from './sankey_diagram';
+import sunburst_diagram from './sunburst_diagram';
 import treemap from './treemap';
 
 export const ChartSymbols = {
-  pie_chart, treemap
+  donut_chart, radar_chart, sankey_diagram, sunburst_diagram, treemap
 };
 
-export { pie_chart, treemap };
+export { donut_chart, radar_chart, sankey_diagram, sunburst_diagram, treemap };
