@@ -4,6 +4,7 @@ import * as inquirer from 'inquirer';
 import * as path from 'path';
 import * as SVGO from 'svgo';
 import { SVGO_SETTINGS } from './svgo-settings';
+import { SVG_PATH, TS_PATH } from './utils';
 
 interface IChartInfo {
   chartId: string;
@@ -20,9 +21,6 @@ interface IChartBaseRecord {
   chartName: string;
   svgCode: string;
 }
-
-const SVG_PATH = 'svgs/';
-const TS_PATH = 'src/charts/';
 
 const genChartBaseRecord = async (fileName: string): Promise<IChartBaseRecord> => {
   const chartId = fileName;

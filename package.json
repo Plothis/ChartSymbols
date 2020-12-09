@@ -14,6 +14,8 @@
   ],
   "scripts": {
     "start": "webpack-dev-server --port 8325",
+    "extractsvg": "npm run build && node lib/scripts/extract-svg.js",
+    "readmepreview": "npm run build && node lib/scripts/readme-preview.js",
     "test": "jest --config jestconfig.json",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
