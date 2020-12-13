@@ -1,8 +1,13 @@
 name: update-chart-build
 
-on: 
-  pull_request:
+on:
+  issues:
+    branches: [master, workflows]
     types: [labeled]
+  pull_request:
+    branches: [master, workflows]
+    types: [labeled]
+  workflow_dispatch:
 
 jobs:
   extract-and-update:
