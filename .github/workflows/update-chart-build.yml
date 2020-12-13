@@ -20,10 +20,7 @@ jobs:
           node-version: '12.x'
       - name: Install dependencies
         run: npm install
-
-  extract-and-update:
-    runs-on: ubuntu-latest
-    steps:
+        
       - name: extractsvg
         run: npm run extractsvg
 
