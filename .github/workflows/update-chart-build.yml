@@ -1,0 +1,15 @@
+name: update-chart-build
+
+on: 
+  pull_request:
+    types: [labeled]
+
+jobs:
+  extract-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: extractsvg
+        run: npm run extractsvg
+
+      - name: readmepreview
+        run: npm run readmepreview
