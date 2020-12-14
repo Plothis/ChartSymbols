@@ -22,7 +22,7 @@ jobs:
         run: npm install
         
       - name: extractsvg
-        run: npm run extractsvg
+        run: npm run extractsvg strict
 
       - name: readmepreview
         run: npm run readmepreview
