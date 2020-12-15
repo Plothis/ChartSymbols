@@ -18,7 +18,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '12.x'
+          node-version: "12.x"
       - name: Install dependencies
         run: npm install
 
@@ -28,18 +28,20 @@ jobs:
       - name: readmepreview
         run: npm run readmepreview
 
-      - name: debug
-        run: |
-          echo "${{ toJson(github.event.pull_request.labels) }}"
+      - name: Get Changed SVGs
+        uses: jitterbit/get-changed-files@v1
+        id: files
+        with:
+          format: "svg"
 
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
+          comment-author: "github-actions[bot]"
           body-includes: |
-            >>> Preview:
+            Preview >>>>
 
       - name: Create comment
         if: ${{ steps.fc.outputs.comment-id == 0 }}
@@ -47,8 +49,9 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            >>> Preview: xxx
-          reaction-type: 'rocket'
+            Preview >>>>
+
+            ${{ steps.files.outputs.all }}
 
       - name: Update comment
         if: ${{ steps.fc.outputs.comment-id != 0 }}
@@ -57,7 +60,8 @@ jobs:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           edit-mode: replace
           body: |
-            >>> Preview: 
+            Preview >>>>
+
+            ${{ steps.files.outputs.all }}
             
             This comment has been updated!
-          reaction-type: 'rocket'
