@@ -18,7 +18,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Install dependencies
         run: npm install
 
@@ -31,3 +31,29 @@ jobs:
       - name: debug
         run: |
           echo "${{ toJson(github.event.pull_request.labels) }}"
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v1
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '>>> Preview: '
+
+      - name: Create comment
+        if: ${{ steps.fc.outputs.comment-id == 0 }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ">>> Preview: xxx"
+          reaction-type: 'rocket'
+
+      - name: Update comment
+        if: ${{ steps.fc.outputs.comment-id != 0 }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          body: |
+            This comment has been updated!
+          reaction-type: 'rocket'
