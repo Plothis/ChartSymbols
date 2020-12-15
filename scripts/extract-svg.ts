@@ -22,6 +22,10 @@ interface IChartBaseRecord {
   svgCode: string;
 }
 
+interface IExtractSVGsParam {
+  strict: boolean;
+}
+
 const genChartBaseRecord = async (fileName: string): Promise<IChartBaseRecord> => {
   const chartId = fileName;
   const chartName = CHART_ID_OPTIONS.includes(fileName as ChartID) ? ckb[fileName].name : fileName;
@@ -74,7 +78,7 @@ const ckb = CKBJson();
  * Extract svg images from `svgs/`, optimize svg codes
  * and then generate corresponding ts file in `src/charts/`.
  */
-const extractSVGs = async () => {
+const extractSVGs = async ({ strict }: IExtractSVGsParam) => {
   // get all charts
 
   const chartBase: IChartBaseRecord[] = [];
@@ -110,15 +114,20 @@ const extractSVGs = async () => {
   // tslint:disable-next-line: no-console
   notices.forEach(notice => console.log(notice));
 
-  await inquirer.prompt(questions).then(async answers => {
-    await Promise.all(
-      Object.keys(answers).map(async fileName => {
-        if (answers[fileName]) {
-          chartBase.push(await genChartBaseRecord(fileName));
-        }
-      }),
-    );
-  });
+  if (strict) {
+    // tslint:disable-next-line: no-console
+    questions.forEach(({ name }) => console.log(`The name of file ${name} is not a ChartID. It has been ignored.`));
+  } else {
+    await inquirer.prompt(questions).then(async answers => {
+      await Promise.all(
+        Object.keys(answers).map(async fileName => {
+          if (answers[fileName]) {
+            chartBase.push(await genChartBaseRecord(fileName));
+          }
+        }),
+      );
+    });
+  }
 
   // clear charts
 
@@ -148,5 +157,9 @@ const extractSVGs = async () => {
 };
 
 (async () => {
-  await extractSVGs();
+  const myArgs = process.argv.slice(2);
+
+  const isStrictMode = myArgs.length && myArgs[0] && myArgs[0] === 'strict' ? true : false;
+
+  await extractSVGs({ strict: isStrictMode });
 })();
