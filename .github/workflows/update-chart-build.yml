@@ -31,8 +31,6 @@ jobs:
       - name: Get Changed SVGs
         uses: jitterbit/get-changed-files@v1
         id: files
-        with:
-          format: "svg"
 
       - name: Find Comment
         uses: peter-evans/find-comment@v1
@@ -51,7 +49,7 @@ jobs:
           body: |
             Preview >>>>
 
-            ${{ steps.files.outputs.all }}
+            ${{ steps.files.outputs.added_modified }}
 
       - name: Update comment
         if: ${{ steps.fc.outputs.comment-id != 0 }}
@@ -62,6 +60,6 @@ jobs:
           body: |
             Preview >>>>
 
-            ${{ steps.files.outputs.all }}
+            ${{ steps.files.outputs.added_modified }}
             
             This comment has been updated!
