@@ -55,6 +55,9 @@ jobs:
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
+          edit-mode: replace
           body: |
+            >>> Preview: 
+            
             This comment has been updated!
           reaction-type: 'rocket'
