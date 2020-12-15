@@ -38,7 +38,8 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
-          body-includes: '>>> Preview: '
+          body-includes: |
+            >>> Preview:
 
       - name: Create comment
         if: ${{ steps.fc.outputs.comment-id == 0 }}
@@ -46,7 +47,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            ">>> Preview: xxx"
+            >>> Preview: xxx
           reaction-type: 'rocket'
 
       - name: Update comment
