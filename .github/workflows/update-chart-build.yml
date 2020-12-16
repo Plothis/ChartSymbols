@@ -2,10 +2,10 @@ name: update-chart-build
 
 on:
   issues:
-    branches: [master, workflows]
+    branches: [master, actions]
     types: [labeled]
   pull_request:
-    branches: [master, workflows]
+    branches: [master, actions]
     types: [labeled]
   workflow_dispatch:
 
