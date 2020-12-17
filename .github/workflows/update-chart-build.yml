@@ -53,6 +53,14 @@ jobs:
         uses: jitterbit/get-changed-files@v1
         id: files
 
+      - name: String replace
+        id: imagetags
+        uses: frabert/replace-string-action@v1.2
+        with:
+          pattern: 'svgs\/([A-Za-z_]*)\.svg'
+          string: ${{ steps.files.outputs.added_modified }}
+          replace-with: '<img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg">'
+
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
@@ -70,7 +78,7 @@ jobs:
           body: |
             Preview >>>>
 
-            ${{ steps.files.outputs.added_modified }}
+            ${{ steps.imagetags.outputs.replaced }}
 
       - name: Update comment
         if: ${{ steps.fc.outputs.comment-id != 0 }}
@@ -81,6 +89,6 @@ jobs:
           body: |
             Preview >>>>
 
-            ${{ steps.files.outputs.added_modified }}
+            ${{ steps.imagetags.outputs.replaced }}
 
             This comment has been updated!
