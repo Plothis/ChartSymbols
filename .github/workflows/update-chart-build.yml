@@ -68,7 +68,7 @@ jobs:
         uses: frabert/replace-string-action@v1.2
         with:
           pattern: 'svgs\/([A-Za-z_]*)\.svg'
-          string: ${{ steps.files.outputs.added }}
+          string: ${{ steps.files.outputs.modified }}
           replace-with: |
             |$1 | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.base_ref }}/svgs/$1.svg"> | >>><br>added | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"> |
           flags: "g"
