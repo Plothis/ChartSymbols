@@ -83,6 +83,21 @@ jobs:
             </tr>
           flags: "g"
 
+      - name: String replace File Removed
+        id: removed_svgs
+        uses: frabert/replace-string-action@v1.2
+        with:
+          pattern: 'svgs\/([A-Za-z_]*)\.svg'
+          string: ${{ steps.files.outputs.removed }}
+          replace-with: |
+            <tr>
+              <td align="center">$1</td>
+              <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.base_ref }}/svgs/$1.svg"></td>
+              <td align="center">>>><br>removed</td>
+              <td align="center"></td>
+            </tr>
+          flags: "g"
+
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
