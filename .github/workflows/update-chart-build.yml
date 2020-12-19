@@ -60,6 +60,7 @@ jobs:
           pattern: 'svgs\/([A-Za-z_]*)\.svg'
           string: ${{ steps.files.outputs.added }}
           replace-with: |
+            |
             |$1 | | >>><br>added | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"> |
           flags: "g"
 
