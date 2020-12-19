@@ -53,14 +53,24 @@ jobs:
         uses: jitterbit/get-changed-files@v1
         id: files
 
-      - name: String replace
+      - name: String replace File Added
         id: added_svgs
         uses: frabert/replace-string-action@v1.2
         with:
           pattern: 'svgs\/([A-Za-z_]*)\.svg'
           string: ${{ steps.files.outputs.added }}
           replace-with: |
-            |$1 | | >>><br>added | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/treemap.svg"> |
+            |$1 | | >>><br>added | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"> |
+          flags: "g"
+
+      - name: String replace File Modified
+        id: modified_svgs
+        uses: frabert/replace-string-action@v1.2
+        with:
+          pattern: 'svgs\/([A-Za-z_]*)\.svg'
+          string: ${{ steps.files.outputs.added }}
+          replace-with: |
+            |$1 | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.base_ref }}/svgs/$1.svg"> | >>><br>added | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"> |
           flags: "g"
 
       - name: Find Comment
@@ -83,6 +93,7 @@ jobs:
             | chart id |  base       |      status      |  head |
             |:---:| :-------------: |:-------------:| :-----:|
             ${{ steps.added_svgs.outputs.replaced }}
+            ${{ steps.modified_svgs.outputs.replaced }}
 
       - name: Update comment
         if: ${{ steps.fc.outputs.comment-id != 0 }}
@@ -96,5 +107,6 @@ jobs:
             | chart id |  base       |      status      |  head |
             |:---:| :-------------: |:-------------:| :-----:|
             ${{ steps.added_svgs.outputs.replaced }}
+            ${{ steps.modified_svgs.outputs.replaced }}
 
             This comment has been updated!
