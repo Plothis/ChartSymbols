@@ -60,8 +60,12 @@ jobs:
           pattern: 'svgs\/([A-Za-z_]*)\.svg'
           string: ${{ steps.files.outputs.added }}
           replace-with: |
-            |$1 | | >>><br>added | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"> |
-            
+            <tr>
+              <td align="center">$1</td>
+              <td align="center"></td>
+              <td align="center">>>><br>added</td>
+              <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"></td>
+            </tr>
           flags: "g"
 
       - name: String replace File Modified
@@ -71,7 +75,12 @@ jobs:
           pattern: 'svgs\/([A-Za-z_]*)\.svg'
           string: ${{ steps.files.outputs.modified }}
           replace-with: |
-            |$1 | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.base_ref }}/svgs/$1.svg"> | >>><br>added | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"> |
+            <tr>
+              <td align="center">$1</td>
+              <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.base_ref }}/svgs/$1.svg"></td>
+              <td align="center">>>><br>modified</td>
+              <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"></td>
+            </tr>
           flags: "g"
 
       - name: Find Comment
@@ -91,10 +100,16 @@ jobs:
           body: |
             Preview >>>>
 
-            | chart id |  base       |      status      |  head |
-            |:---:| :-------------: |:-------------:| :-----:|
+            <table>
+              <tr>
+                <th>chart id</th>
+                <th>base</th>
+                <th>status</th>
+                <th>head</th>
+              </tr>
             ${{ steps.added_svgs.outputs.replaced }}
             ${{ steps.modified_svgs.outputs.replaced }}
+            </table>
 
       - name: Update comment
         if: ${{ steps.fc.outputs.comment-id != 0 }}
@@ -105,9 +120,15 @@ jobs:
           body: |
             Preview >>>>
 
-            | chart id |  base       |      status      |  head |
-            |:---:| :-------------: |:-------------:| :-----:|
+            <table>
+              <tr>
+                <th>chart id</th>
+                <th>base</th>
+                <th>status</th>
+                <th>head</th>
+              </tr>
             ${{ steps.added_svgs.outputs.replaced }}
             ${{ steps.modified_svgs.outputs.replaced }}
+            </table>
 
             This comment has been updated!
