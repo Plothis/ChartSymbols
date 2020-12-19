@@ -54,20 +54,21 @@ jobs:
         id: files
 
       - name: String replace
-        id: imagetags
+        id: added_svgs
         uses: frabert/replace-string-action@v1.2
         with:
           pattern: 'svgs\/([A-Za-z_]*)\.svg'
-          string: ${{ steps.files.outputs.added_modified }}
-          replace-with: '<img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg">'
-          flags: 'g'
+          string: ${{ steps.files.outputs.added }}
+          replace-with: |
+            |$1 | | >>><br>added | <img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/treemap.svg"> |
+          flags: "g"
 
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
+          comment-author: "github-actions[bot]"
           body-includes: |
             Preview >>>>
 
@@ -79,7 +80,9 @@ jobs:
           body: |
             Preview >>>>
 
-            ${{ steps.imagetags.outputs.replaced }}
+            | chart id |  base       |      status      |  head |
+            |:---:| :-------------: |:-------------:| :-----:|
+            ${{ steps.added_svgs.outputs.replaced }}
 
       - name: Update comment
         if: ${{ steps.fc.outputs.comment-id != 0 }}
@@ -90,6 +93,8 @@ jobs:
           body: |
             Preview >>>>
 
-            ${{ steps.imagetags.outputs.replaced }}
+            | chart id |  base       |      status      |  head |
+            |:---:| :-------------: |:-------------:| :-----:|
+            ${{ steps.added_svgs.outputs.replaced }}
 
             This comment has been updated!
