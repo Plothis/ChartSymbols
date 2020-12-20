@@ -53,8 +53,12 @@ jobs:
         uses: jitterbit/get-changed-files@v1
         id: files
 
-      - name: Set current date as env variable
-        run: echo "NOW::$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYYMMDD-HH
+          utcOffset: '+08:00'
 
       - name: String replace File Added
         id: added_svgs
@@ -165,4 +169,4 @@ jobs:
             ${{ steps.removed_svgs.outputs.replaced }}
             </table>
 
-            This comment has been updated at $NOW
+            This comment has been updated at ${{ steps.current-time.outputs.readableTime }}
