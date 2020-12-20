@@ -2,10 +2,10 @@ name: update-chart-build
 
 on:
   issues:
-    branches: [master, workflows]
+    branches: [master, actions]
     types: [labeled]
   pull_request:
-    branches: [master, workflows]
+    branches: [master, actions]
     types: [labeled]
   workflow_dispatch:
 
@@ -53,12 +53,64 @@ jobs:
         uses: jitterbit/get-changed-files@v1
         id: files
 
+      - name: Get current time
+        uses: 1466587594/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYYMMDD-HH
+          utcOffset: '+08:00'
+
+      - name: String replace File Added
+        id: added_svgs
+        uses: frabert/replace-string-action@v1.2
+        with:
+          pattern: 'svgs\/([A-Za-z_]*)\.svg'
+          string: ${{ steps.files.outputs.added }}
+          replace-with: |
+            <tr>
+              <td align="center">$1</td>
+              <td align="center"></td>
+              <td align="center">+++<br>added</td>
+              <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"></td>
+            </tr>
+          flags: 'g'
+
+      - name: String replace File Modified
+        id: modified_svgs
+        uses: frabert/replace-string-action@v1.2
+        with:
+          pattern: 'svgs\/([A-Za-z_]*)\.svg'
+          string: ${{ steps.files.outputs.modified }}
+          replace-with: |
+            <tr>
+              <td align="center">$1</td>
+              <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.base_ref }}/svgs/$1.svg"></td>
+              <td align="center">>>><br>modified</td>
+              <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"></td>
+            </tr>
+          flags: 'g'
+
+      - name: String replace File Removed
+        id: removed_svgs
+        uses: frabert/replace-string-action@v1.2
+        with:
+          pattern: 'svgs\/([A-Za-z_]*)\.svg'
+          string: ${{ steps.files.outputs.removed }}
+          replace-with: |
+            <tr>
+              <td align="center">$1</td>
+              <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.base_ref }}/svgs/$1.svg"></td>
+              <td align="center">---<br>removed</td>
+              <td align="center"></td>
+            </tr>
+          flags: 'g'
+
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
+          comment-author: 'github-actions[bot]'
           body-includes: |
             Preview >>>>
 
@@ -70,7 +122,24 @@ jobs:
           body: |
             Preview >>>>
 
-            ${{ steps.files.outputs.added_modified }}
+            added: ${{ steps.files.outputs.added }}
+            modified: ${{ steps.files.outputs.modified }}
+            removed: ${{ steps.files.outputs.removed }}
+            renamed: ${{ steps.files.outputs.renamed }}
+
+            ---
+
+            <table>
+              <tr>
+                <th>chart id</th>
+                <th>base</th>
+                <th>status</th>
+                <th>head</th>
+              </tr>
+            ${{ steps.added_svgs.outputs.replaced }}
+            ${{ steps.modified_svgs.outputs.replaced }}
+            ${{ steps.removed_svgs.outputs.replaced }}
+            </table>
 
       - name: Update comment
         if: ${{ steps.fc.outputs.comment-id != 0 }}
@@ -81,6 +150,23 @@ jobs:
           body: |
             Preview >>>>
 
-            ${{ steps.files.outputs.added_modified }}
+            added: ${{ steps.files.outputs.added }}
+            modified: ${{ steps.files.outputs.modified }}
+            removed: ${{ steps.files.outputs.removed }}
+            renamed: ${{ steps.files.outputs.renamed }}
 
-            This comment has been updated!
+            ---
+
+            <table>
+              <tr>
+                <th>chart id</th>
+                <th>base</th>
+                <th>status</th>
+                <th>head</th>
+              </tr>
+            ${{ steps.added_svgs.outputs.replaced }}
+            ${{ steps.modified_svgs.outputs.replaced }}
+            ${{ steps.removed_svgs.outputs.replaced }}
+            </table>
+
+            This comment has been updated at ${{ steps.current-time.outputs.readableTime }}
