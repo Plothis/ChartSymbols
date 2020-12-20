@@ -53,6 +53,10 @@ jobs:
         uses: jitterbit/get-changed-files@v1
         id: files
 
+      - name: Get current date
+        id: date
+        run: echo "name=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
       - name: String replace File Added
         id: added_svgs
         uses: frabert/replace-string-action@v1.2
@@ -66,7 +70,7 @@ jobs:
               <td align="center">+++<br>added</td>
               <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"></td>
             </tr>
-          flags: "g"
+          flags: 'g'
 
       - name: String replace File Modified
         id: modified_svgs
@@ -81,7 +85,7 @@ jobs:
               <td align="center">>>><br>modified</td>
               <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"></td>
             </tr>
-          flags: "g"
+          flags: 'g'
 
       - name: String replace File Removed
         id: removed_svgs
@@ -96,14 +100,14 @@ jobs:
               <td align="center">---<br>removed</td>
               <td align="center"></td>
             </tr>
-          flags: "g"
+          flags: 'g'
 
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
+          comment-author: 'github-actions[bot]'
           body-includes: |
             Preview >>>>
 
@@ -162,4 +166,4 @@ jobs:
             ${{ steps.removed_svgs.outputs.replaced }}
             </table>
 
-            This comment has been updated!
+            This comment has been updated at ${{ steps.date.outputs.date }}
