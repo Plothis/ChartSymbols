@@ -38,8 +38,20 @@ jobs:
         if: steps.node_modules_cache_id.outputs.cache-hit != 'true'
         run: npm ci
 
-      - name: extractsvg
-        run: npm run extractsvg strict
+      - name: run build
+        run: npm run build
+
+      - name: test
+        run: pwd
+
+      - name: test2
+        run: ls
+      
+      - name: test3
+        run: node lib/scripts/extract-svg.js
+
+      # - name: extractsvg
+      #   run: npm run extractsvg strict
 
       - name: readmepreview
         run: npm run readmepreview
