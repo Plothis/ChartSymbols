@@ -45,8 +45,8 @@ jobs:
         run: pwd
 
       - name: test2
-        run: ls
-      
+        run: ls lib/scripts
+
       - name: test3
         run: node ./lib/scripts/extract-svg.js
 
