@@ -48,7 +48,7 @@ jobs:
         run: ls
       
       - name: test3
-        run: node lib/scripts/extract-svg.js
+        run: node ./lib/scripts/extract-svg.js
 
       # - name: extractsvg
       #   run: npm run extractsvg strict
