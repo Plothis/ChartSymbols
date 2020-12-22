@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@master
+        with:
+          fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
 
       - name: cache package-lock.json
         uses: actions/cache@v2
@@ -38,20 +40,19 @@ jobs:
         if: steps.node_modules_cache_id.outputs.cache-hit != 'true'
         run: npm ci
 
-      - name: run build
-        run: npm run build
+      - name: Extract Svg
+        run: npm run extractsvg strict
 
-      - name: test
-        run: pwd
-
-      - name: test2
-        run: ls lib/scripts
-
-      - name: test3
-        run: node ./lib/scripts/extract-svg.js
-
-      # - name: extractsvg
-      #   run: npm run extractsvg strict
-
-      - name: readmepreview
+      - name: Update Readme Preview
         run: npm run readmepreview
+
+      - name: Commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "chore: Auto Update from SVGs" -a
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
