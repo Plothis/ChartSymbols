@@ -81,6 +81,9 @@ const ckb = CKBJson();
 const extractSVGs = async ({ strict }: IExtractSVGsParam) => {
   // get all charts
 
+  // tslint:disable-next-line: no-console
+  console.log('start');
+
   const chartBase: IChartBaseRecord[] = [];
 
   const files = await fse.readdir(SVG_PATH);
@@ -148,18 +151,30 @@ const extractSVGs = async ({ strict }: IExtractSVGsParam) => {
     }),
   );
 
+  // tslint:disable-next-line: no-console
+  console.log(chartBase);
+
   // update index.ts
 
   await fse.writeFile(
     path.join(process.cwd(), TS_PATH, 'index.ts'),
     indexTemplate(chartBase.map(rec => rec.tsFileName).sort()),
   );
+
+  // tslint:disable-next-line: no-console
+  console.log('end');
 };
 
 (async () => {
   const myArgs = process.argv.slice(2);
 
+  // tslint:disable-next-line: no-console
+  console.log(myArgs);
+
   const isStrictMode = myArgs.length && myArgs[0] && myArgs[0] === 'strict' ? true : false;
+
+  // tslint:disable-next-line: no-console
+  console.log(isStrictMode);
 
   await extractSVGs({ strict: isStrictMode });
 
