@@ -2,10 +2,10 @@ name: update-chart
 
 on:
   issues:
-    branches: [master, action-test]
+    branches: [master]
     types: [labeled]
   pull_request:
-    branches: [master, action-test]
+    branches: [master]
     types: [labeled]
   workflow_dispatch:
 

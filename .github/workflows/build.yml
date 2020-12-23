@@ -2,7 +2,7 @@ name: build
 
 on:
   push:
-    branches: [master, action-test]
+    branches: [master]
   workflow_dispatch:
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .
-          git commit -m "chore: Auto Update by ${{ github.ref }}" -a
+          git commit -m "chore: Auto Update from SVGs" -a
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
