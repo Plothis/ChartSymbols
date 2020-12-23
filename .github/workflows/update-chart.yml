@@ -1,53 +1,21 @@
-name: update-chart-build
+name: update-chart
 
 on:
   issues:
-    branches: [master, actions]
+    branches: [master]
     types: [labeled]
   pull_request:
-    branches: [master, actions]
+    branches: [master]
     types: [labeled]
   workflow_dispatch:
 
 jobs:
-  setup:
+  update:
     if: ${{ contains(github.event.pull_request.labels.*.name, 'update chart') }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@master
-
-      - name: cache package-lock.json
-        uses: actions/cache@v2
-        with:
-          path: package-temp-dir
-          key: lock-${{ github.sha }}
-
-      - name: create package-lock.json
-        run: npm i --package-lock-only
-
-      - name: hack for single file
-        run: |
-          if [ ! -d "package-temp-dir" ]; then
-            mkdir package-temp-dir
-          fi
-          cp package-lock.json package-temp-dir
-      - name: cache node_modules
-        id: node_modules_cache_id
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: node_modules-${{ hashFiles('**/package-temp-dir/package-lock.json') }}
-
-      - name: install
-        if: steps.node_modules_cache_id.outputs.cache-hit != 'true'
-        run: npm ci
-
-      - name: extractsvg
-        run: npm run extractsvg strict
-
-      - name: readmepreview
-        run: npm run readmepreview
 
       - name: Get Changed SVGs
         uses: jitterbit/get-changed-files@v1
@@ -58,7 +26,7 @@ jobs:
         id: current-time
         with:
           format: YYYYMMDD-HH
-          utcOffset: '+08:00'
+          utcOffset: "+08:00"
 
       - name: String replace File Added
         id: added_svgs
@@ -73,7 +41,7 @@ jobs:
               <td align="center">+++<br>added</td>
               <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"></td>
             </tr>
-          flags: 'g'
+          flags: "g"
 
       - name: String replace File Modified
         id: modified_svgs
@@ -88,7 +56,7 @@ jobs:
               <td align="center">>>><br>modified</td>
               <td align="center"><img src="https://raw.githubusercontent.com/Plothis/ChartSymbols/${{ github.head_ref }}/svgs/$1.svg"></td>
             </tr>
-          flags: 'g'
+          flags: "g"
 
       - name: String replace File Removed
         id: removed_svgs
@@ -103,14 +71,14 @@ jobs:
               <td align="center">---<br>removed</td>
               <td align="center"></td>
             </tr>
-          flags: 'g'
+          flags: "g"
 
       - name: Find Comment
         uses: peter-evans/find-comment@v1
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
+          comment-author: "github-actions[bot]"
           body-includes: |
             Preview >>>>
 

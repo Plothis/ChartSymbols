@@ -162,4 +162,7 @@ const extractSVGs = async ({ strict }: IExtractSVGsParam) => {
   const isStrictMode = myArgs.length && myArgs[0] && myArgs[0] === 'strict' ? true : false;
 
   await extractSVGs({ strict: isStrictMode });
+
+  // tslint:disable-next-line: no-console
+  console.log('extract svg done!');
 })();
