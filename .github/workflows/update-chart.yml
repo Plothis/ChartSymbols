@@ -175,6 +175,11 @@ jobs:
           git add .
           git commit -m "chore: Auto Update from SVGs" -a
 
+      - name: test log
+        run: |
+          git status
+          echo "${{ github.ref }}"
+
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
