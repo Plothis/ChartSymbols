@@ -136,6 +136,8 @@ jobs:
 
             This comment has been updated at ${{ steps.current-time.outputs.readableTime }}
 
+            The refreshing of the above pictures may be delayed, please wait and refresh manually.
+
       - name: cache package-lock.json
         uses: actions/cache@v2
         with:
@@ -178,10 +180,10 @@ jobs:
       - name: test log
         run: |
           git status
-          echo "${{ github.ref }}"
+          echo "${{ github.head_ref }}"
 
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
+          branch: ${{ github.head_ref }}
