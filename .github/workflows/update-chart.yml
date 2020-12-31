@@ -2,7 +2,7 @@ name: update-chart
 
 on:
   pull_request:
-    branches: [master, automerge]
+    branches: [master]
     types: [labeled]
   workflow_dispatch:
 

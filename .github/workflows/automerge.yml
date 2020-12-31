@@ -2,7 +2,7 @@ name: automerge
 
 on:
   pull_request:
-    branches: [master, automerge]
+    branches: [master]
     types:
       - labeled
       - unlabeled
