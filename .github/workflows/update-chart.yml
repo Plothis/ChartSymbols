@@ -172,11 +172,6 @@ jobs:
       - name: Update Readme Preview
         run: npm run readmepreview
 
-      - name: test log 1
-        run: |
-          git status
-          echo "${{ github.head_ref }}"
-
       - name: Commit files
         run: |
           git config --local user.email "action@github.com"
@@ -184,11 +179,6 @@ jobs:
           git pull --ff-only origin ${{ github.head_ref }}
           git add .
           git commit -m "chore: Auto Update from SVGs" -a
-
-      - name: test log 2
-        run: |
-          git status
-          echo "${{ github.head_ref }}"
 
       - name: Push changes
         uses: ad-m/github-push-action@master
