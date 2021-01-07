@@ -51,25 +51,26 @@ const genChartBaseRecord = async (fileName: string): Promise<IChartBaseRecord> =
 
 const svgo: SVGO = new SVGO(SVGO_SETTINGS);
 
+// chartId.toUpperCase(): variable name must be in lowerCamelCase, PascalCase or UPPER_CASE
 const fileTemplate = ({ chartId, chartName, svgCode }: IChartInfo) => `// ${chartId}
 
-const ${chartId} = {
+const ${chartId.toUpperCase()} = {
   name: '${chartName}',
   svgCode: '${svgCode}'
 };
 
-export default ${chartId};
+export default ${chartId.toUpperCase()};
 `;
 
 const indexTemplate = (chartFiles: string[]) => `// generated file index.ts
 
-${chartFiles.map((file: string) => `import ${file} from './${file}';`).join('\n')}
+${chartFiles.map((file: string) => `import ${file.toUpperCase()} from './${file}';`).join('\n')}
 
 export const ChartSymbols = {
-  ${chartFiles.map((file: string) => `${file}`).join(', ')}
+  ${chartFiles.map((file: string) => `${file.toUpperCase()}`).join(', ')}
 };
 
-export { ${chartFiles.map((file: string) => `${file}`).join(', ')} };
+export { ${chartFiles.map((file: string) => `${file.toUpperCase()}`).join(', ')} };
 `;
 
 const ckb = CKBJson();
