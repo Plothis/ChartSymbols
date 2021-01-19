@@ -2,6 +2,8 @@
 
 Symbols of Chart Types.
 
+This project is **WIP**
+
 <!-- PREVIEW START -->
 
 <div style="display: flex; flex-flow: row wrap;">
